@@ -1,0 +1,86 @@
+.search-on-etsy {
+	float: left;
+	position: relative;
+	width: 78%;
+	form {
+		@include box-sizing(border-box);
+		border: 1px solid $gray-light;
+		float: left;
+		padding: 10px;
+		position: relative;
+		width: 70%;
+		.etsy-keywords {
+			height: 36px;
+			width: 90%;
+		}
+		.button {
+			height: 36px;
+			position: absolute;
+			right: 10px;
+			top: 10px;
+		}
+		.etsy-category-filter {
+			padding: 8px 0 0;
+		}
+	}
+	.button-control {
+		@include box-sizing(border-box);
+		float: left;
+		padding: 0 0 0 20px;
+		width: 30%;
+	}
+	.button-save {
+		@include opacity(0);
+		@include transition (opacity 0.3s ease-in-out);
+		height: 80px;
+		width: 100%;
+		&.show {
+			@include opacity(1);
+			@include transition (opacity 0.3s ease-in-out 2s);
+		}
+	}
+}
+.search-on-etsy-results {
+	clear: both;
+	padding: 20px 0 0;
+}
+.search-on-etsy-results ul {
+	@include reset-list();
+	margin: 0 -4px;
+	li {
+		border: 1px solid $gray-light;
+		float: left;
+		margin: 0 4px 14px 4px;
+		padding: 6px;
+		width: 172px;
+	}
+	.listing-text {
+		overflow: hidden;
+		padding: 6px 0 0;
+	}
+	.listing-title,
+	.listing-shop,
+	.listing-price {
+		font-size: 1em;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.listing-shop,
+	.listing-price {
+		display: inline-block;
+		width: 50%;
+	}
+	.listing-shop {
+		color: $gray;
+	}
+	.listing-price {
+		color: $green;
+		font-weight: bold;
+		text-align: right;
+	}
+}
+.my-watchlists {
+	float: right;
+	width: 20%;
+}
