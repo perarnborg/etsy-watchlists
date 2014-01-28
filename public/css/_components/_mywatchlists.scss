@@ -11,7 +11,7 @@
 		width: 70%;
 		.etsy-keywords {
 			height: 36px;
-			width: 90%;
+			width: 84%;
 		}
 		.button {
 			height: 36px;
@@ -21,6 +21,13 @@
 		}
 		.etsy-category-filter {
 			padding: 8px 0 0;
+			.etsy-categories {
+				@include reset-list();
+			}
+			.etsy-categories li {
+				display: inline;
+				margin-right: 10px;
+			}
 		}
 	}
 	.button-control {
@@ -40,6 +47,34 @@
 		}
 	}
 }
+.etsy-filters {
+	clear: both;
+	margin-top: 10px;
+	ul {
+		@include reset-list();
+	}
+	li {
+		display: inline-block;
+		background: $blue-light;
+		border-radius: 4px;
+		color: white;
+		padding: 4px 10px 4px 16px;
+		position: relative;
+		a {
+			background: $blue;
+			border-radius: 4px 0 0 4px;
+			color: white;
+			display: block;
+			padding-top: 3px;
+			position: absolute;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			text-align: center;
+			width: 12px;
+		}
+	}
+}
 .search-on-etsy-results {
 	clear: both;
 	padding: 20px 0 0;
@@ -47,6 +82,22 @@
 .search-on-etsy-results ul {
 	@include reset-list();
 	margin: 0 -4px;
+	position: relative;
+	&.pending {
+		&:before {
+			background: url('../images/ajax-loader.gif') no-repeat;
+			content: '';
+			height: 35px;
+			left: 35%;
+			margin-left: -18px;
+			position: absolute;
+			top: 40px;
+			width: 35px;
+		}
+		li {
+			@include opacity(0.3);
+		}
+	}
 	li {
 		border: 1px solid $gray-light;
 		float: left;

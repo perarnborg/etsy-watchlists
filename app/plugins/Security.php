@@ -48,7 +48,7 @@ class Security extends Plugin
 
 			//Etsy user area resources
 			$etsyUserResources = array(
-				'mywatchlists' => array('index', 'search', 'delete'),
+				'mywatchlists' => array('index', 'search', 'categories'),
 			);
 			foreach ($etsyUserResources as $resource => $actions) {
 				$acl->addResource(new Phalcon\Acl\Resource($resource), $actions);

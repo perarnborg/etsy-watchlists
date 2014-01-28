@@ -4,13 +4,13 @@
 	padding-left: 10px;
 	&:before {
 		content: '';
-		@include triangle(8px, black, right);
+		@include triangle(8px, $blue, right);
 		position: absolute;
 		left: 2px;
 		top: 3px;
 	}
 	&.open:before {
-		@include triangle(8px, black, down);
+		@include triangle(8px, $blue, down);
 		left: 0;
 		top: 4px;
 	}

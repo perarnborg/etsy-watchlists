@@ -1,5 +1,5 @@
 <header class="header-global clearfix limiter">
-	Etsy Watchlists
+	<a href="/">Etsy Watchlists</a>
 </header>
 
 <main class="container-global clearfix limiter">
@@ -7,5 +7,4 @@
 </main>
 
 <footer class="footer-global limiter">
-    <p>&copy; Per Arnborg 2014</p>
 </footer>

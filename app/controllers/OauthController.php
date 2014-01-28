@@ -9,6 +9,13 @@ class OauthController extends ControllerBase
 
     public function indexAction()
     {
+        //Go to My Watchlists if already authenticated
+        $auth = $this->session->get('auth');
+        if($auth && isset($auth['etsyuser_id'])) {
+            header('Location: /mywatchlists');
+            return false;
+        }
+
         // instantiate the OAuth object
         // OAUTH_CONSUMER_KEY and OAUTH_CONSUMER_SECRET are constants holding your key and secret
         // and are always used when instantiating the OAuth object
@@ -81,7 +88,7 @@ class OauthController extends ControllerBase
                 $etsyUser->etsy_secret = $acc_token['oauth_token_secret'];
                 $isUpdated = true;
             }
-            if(isUpdated) {
+            if($isUpdated) {
                 $etsyUser->update();
             }
         } else {

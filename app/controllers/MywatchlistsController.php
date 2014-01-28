@@ -27,6 +27,13 @@ class MywatchlistsController extends ControllerBase
         die();
     }
 
+    public function categoriesAction($categoryName = '')
+    {
+        $categories = $this->listCategories($categoryName);
+        echo json_encode($categories);
+        die();
+    }
+
     private function searchListings($keywords, $category, $shipsTo) {
         $url = 'https://openapi.etsy.com/v2/listings/active?limit=40&includes=MainImage,Shop';
         if($shipsTo) {
@@ -66,6 +73,23 @@ class MywatchlistsController extends ControllerBase
 
     private function listTopCategories() {
         $url = 'https://openapi.etsy.com/v2/taxonomy/categories';
+        $oauth = new OAuth($this->config->api_key, $this->config->api_secret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
+        $oauth->setToken($this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret);
+        $categories = array();
+        try {
+            $data = $oauth->fetch($url, null, OAUTH_HTTP_METHOD_GET);
+            $json = $oauth->getLastResponse();
+            $categories = json_decode($json)->results;
+        } catch (OAuthException $e) {
+            error_log($e->getMessage());
+            error_log(print_r($oauth->getLastResponse(), true));
+            error_log(print_r($oauth->getLastResponseInfo(), true));
+        }
+        return $categories;
+    }
+
+    private function listCategories($categoryName) {
+        $url = 'https://openapi.etsy.com/v2/taxonomy/categories/'.$categoryName;
         $oauth = new OAuth($this->config->api_key, $this->config->api_secret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
         $oauth->setToken($this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret);
         $categories = array();

@@ -8,6 +8,16 @@
 class Elements extends Phalcon\Mvc\User\Component
 {
 
+    private $_placeholderImageUrlBase = 'http://placehold.it/';
+
+    public function placeholderImageUrl($width, $height, $text = '', $bg = 'CCC', $color = 'FFF') {
+        return 'http://placehold.it/'.$width.'x'.$height.'/'.$bg.'/'.$color.(strlen($text) > 0 ? '&text='.$text : '');
+    }
+
+    public function placeholderImageTag($width, $height, $text = '', $className = '', $bg = 'CCC', $color = 'FFF') {
+        return '<img src="'.$this->placeholderImageUrl($width, $height, $text, $bg, $color).'" alt="'.$text.'"'.(strlen($className) > 0 ? ' class="'.$className.'"' : '').' />';
+    }
+
     private $_adminMenu = array(
         'main-menu' => array(
             'etsyusers' => array(

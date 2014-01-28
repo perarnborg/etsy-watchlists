@@ -11,15 +11,6 @@ class IndexController extends ControllerBase
 
     public function indexAction()
     {
-        if (!$this->request->isPost()) {
-            $this->flash->notice('This is a notice');
-
-            $watchlists = Watchlists::find();
-
-//            var_dump($watchlists);
-//            var_dump(serialize($watchlists));
-
-        }
     }
 
     public function DeniedAction()
