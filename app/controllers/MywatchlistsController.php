@@ -7,6 +7,7 @@ class MywatchlistsController extends ControllerBase
         $this->config = $config->etsy;
         $etsyuser_id = $this->session->get('auth')['etsyuser_id'];
         $this->currentEtsyUser = EtsyUsers::findFirst($etsyuser_id);
+        $this->parameters = Parameters::find();
     }
 
     public function indexAction()
@@ -14,15 +15,17 @@ class MywatchlistsController extends ControllerBase
         $this->view->setTemplateAfter('main');
         $this->view->etsyUser = $this->currentEtsyUser;
         $this->view->watchlists = $this->currentEtsyUser->watchlists;
-        $this->view->categories = $this->listTopCategories();
+        $this->view->categories = $this->listCategories();
+        $this->view->countries = $this->listCountries();
+        $this->view->parameters = $this->parameters;
     }
 
     public function searchAction()
     {
         $keywords = isset($_GET['keywords']) ? $_GET['keywords'] : null;
         $category = isset($_GET['category']) ? $_GET['category'] : null;
-        $shipsTo = isset($_GET['shipsTo']) ? $_GET['shipsTo'] : false;
-        $listings = $this->searchListings($keywords, $category, $shipsTo);
+        $shipsto = isset($_GET['shipsto']) ? $_GET['shipsto'] : false;
+        $listings = $this->searchListings($keywords, $category, $shipsto);
         echo json_encode($listings);
         die();
     }
@@ -34,9 +37,9 @@ class MywatchlistsController extends ControllerBase
         die();
     }
 
-    private function searchListings($keywords, $category, $shipsTo) {
+    private function searchListings($keywords, $category, $shipsto) {
         $url = 'https://openapi.etsy.com/v2/listings/active?limit=40&includes=MainImage,Shop';
-        if($shipsTo) {
+        if($shipsto) {
             $url .= ',ShippingInfo';
         }
         if($keywords) {
@@ -52,11 +55,11 @@ class MywatchlistsController extends ControllerBase
             $data = $oauth->fetch($url, null, OAUTH_HTTP_METHOD_GET);
             $json = $oauth->getLastResponse();
             $listings = json_decode($json)->results;
-            if($shipsTo) {
+            if($shipsto) {
                 $filteredResults = array();
                 foreach($results as $result) {
                     foreach($result->ShippingInfo as $shipping) {
-                        if($shipping->destination_country_id == null || $shipping->destination_country_name == $shipsTo) {
+                        if($shipping->destination_country_id == null || $shipping->destination_country_name == $shipsto) {
                             array_push($filteredResults, $result);
                         }
                     }
@@ -71,8 +74,8 @@ class MywatchlistsController extends ControllerBase
         return $listings;
     }
 
-    private function listTopCategories() {
-        $url = 'https://openapi.etsy.com/v2/taxonomy/categories';
+    private function listCategories($categoryName = '') {
+        $url = 'https://openapi.etsy.com/v2/taxonomy/categories/'.$categoryName;
         $oauth = new OAuth($this->config->api_key, $this->config->api_secret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
         $oauth->setToken($this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret);
         $categories = array();
@@ -88,20 +91,20 @@ class MywatchlistsController extends ControllerBase
         return $categories;
     }
 
-    private function listCategories($categoryName) {
-        $url = 'https://openapi.etsy.com/v2/taxonomy/categories/'.$categoryName;
+    private function listCountries() {
+        $url = 'https://openapi.etsy.com/v2/countries';
         $oauth = new OAuth($this->config->api_key, $this->config->api_secret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
         $oauth->setToken($this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret);
-        $categories = array();
+        $countries = array();
         try {
             $data = $oauth->fetch($url, null, OAUTH_HTTP_METHOD_GET);
             $json = $oauth->getLastResponse();
-            $categories = json_decode($json)->results;
+            $countries = json_decode($json)->results;
         } catch (OAuthException $e) {
             error_log($e->getMessage());
             error_log(print_r($oauth->getLastResponse(), true));
             error_log(print_r($oauth->getLastResponseInfo(), true));
         }
-        return $categories;
+        return $countries;
     }
 }

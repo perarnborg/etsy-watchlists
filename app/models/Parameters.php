@@ -1,5 +1,5 @@
 <?php
-
+use Phalcon\Mvc\Model\Relation;
 class Parameters extends Phalcon\Mvc\Model
 {
     /**
