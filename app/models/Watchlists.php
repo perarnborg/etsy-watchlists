@@ -20,6 +20,21 @@ class Watchlists extends Phalcon\Mvc\Model
     /**
      * @var int
      */
+    public $email_interval;
+
+    /**
+     * @var int
+     */
+    public $last_email;
+
+    /**
+     * @var int
+     */
+    public $last_checked;
+
+    /**
+     * @var int
+     */
     public $created;
 
     public function initialize()

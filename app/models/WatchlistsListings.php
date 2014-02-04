@@ -62,6 +62,16 @@ class WatchlistsListings extends Phalcon\Mvc\Model
      */
     public $creation;
 
+    /**
+     * @var int
+     */
+    public $is_emailed;
+
+    /**
+     * @var int
+     */
+    public $is_viewed;
+
     public function initialize()
     {
         $this->belongsTo('watchlists_id', 'Watchlists', 'id', array(

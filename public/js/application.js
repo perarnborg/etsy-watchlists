@@ -116,6 +116,7 @@ app.Mywatchlists.prototype.setup = function() {
     } else {
 		this.$saveButton.val('Update<br>watchlist');
 		$('h1').html(this.watchlist.name);
+
 		for(var i = 0; i < this.watchlist.watchlists_parameters.length; i++) {
 			var watchlistParameter = this.watchlist.watchlists_parameters[i];
 			var apiName = this.getParameterApiName(watchlistParameter.parameters_id);
@@ -349,11 +350,12 @@ app.Mywatchlists.prototype.getListingFromResponse = function(listingResponse) {
 		shop_url: listingResponse.Shop.url,
 		currency_code: listingResponse.currency_code,
 		price: listingResponse.price,
-		creation: listingResponse.creation_tsz
+		creation: listingResponse.creation_tsz,
+		is_viewed: 1
 	};
 	return listing;
 };
 
 app.Mywatchlists.prototype.getListingMarkup = function(listing) {
-	return '<li><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><img src="'+listing.image_url+'" alt="'+listing.title+'" /></a><div class="listing-text clearfix"><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><h3 class="listing-title">'+listing.title+'</h3></a><a class="listing-shop" href="'+listing.shop_url+'" title="Checkout '+listing.shop_loginname+(listing.shop_loginname.toLowerCase().substr(listing.shop_loginname.length-1, 1) == 's' ? "'" : "'s")+' shop" target="_blank">'+listing.shop_loginname+'</a><span class="listing-price">'+listing.currency_code+' '+listing.price+'</span></div></li>';
+	return '<li'+(listing.is_viewed ? '' : 'class="listing-new"')+'><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><img src="'+listing.image_url+'" alt="'+listing.title+'" /></a><div class="listing-text clearfix"><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><h3 class="listing-title">'+listing.title+'</h3></a><a class="listing-shop" href="'+listing.shop_url+'" title="Checkout '+listing.shop_loginname+(listing.shop_loginname.toLowerCase().substr(listing.shop_loginname.length-1, 1) == 's' ? "'" : "'s")+' shop" target="_blank">'+listing.shop_loginname+'</a><span class="listing-price">'+listing.currency_code+' '+listing.price+'</span></div></li>';
 };

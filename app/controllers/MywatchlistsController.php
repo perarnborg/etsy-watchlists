@@ -29,9 +29,18 @@ class MywatchlistsController extends ControllerBase
         $this->view->etsyUser = $this->currentEtsyUser;
         if($watchlistId) {
             $watchlist = Watchlists::findFirst($watchlistId);
+            $watchlistsListings = $watchlist->watchlistsListings;
             $this->view->watchlist = $watchlist;
             $this->view->watchlistParameters = $watchlist->watchlistsParameters;
-            $this->view->watchlistListings = $watchlist->watchlistsListings;
+            $this->view->watchlistListings = $watchlistsListings;
+            // Set unviewed to viewed
+            foreach($watchlistsListings as $watchlistsListing) {
+                if(!$watchlistsListing->is_viewed) {
+                    $watchlist = Watchlists::findFirst($watchlistsListing->id);
+                    $watchlist->is_viewed = 1;
+                    $watchlist->save();
+                }
+            }
         }
         $this->view->watchlists = $this->currentEtsyUser->watchlists;
         $this->view->categories = $this->listCategories();
@@ -56,6 +65,7 @@ class MywatchlistsController extends ControllerBase
         if($watchlistInput) {
             $watchlist = new Watchlists();
             $watchlist->etsy_users_id = $this->currentEtsyUser->id;
+            $watchlist->last_checked = new Phalcon\Db\RawValue('now()');;
             $watchlist->created = new Phalcon\Db\RawValue('now()');;
             if($watchlistInput->id) {
                 $watchlist = Watchlists::findFirst(array($watchlistInput->id, "users_id =".$this->currentEtsyUser->id));

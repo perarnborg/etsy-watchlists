@@ -93,7 +93,8 @@
 				shop_url: '{{ listing.shop_url }}',
 				currency_code: '{{ listing.currency_code }}',
 				price: '{{ listing.price }}',
-				creation: '{{ listing.creation }}'
+				creation: '{{ listing.creation }}',
+				is_viewed: '{{ listing.is_viewed }}'
 			}
 			{% endfor %}
 		]

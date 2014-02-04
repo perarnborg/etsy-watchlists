@@ -6,14 +6,16 @@
 
 	<div class="watchlists">
 		<ul>
-		{% for watchlist in watchlists %}
+			{% for watchlist in watchlists %}
 			<li class="watchlist">
+				<a href="/mywatchlists/watchlist/{{ watchlist.id }}">
 				{% for index, listing in watchlistListings[watchlist.id] %}
-				<a href="/mywatchlists/watchlist/{{ watchlist.id }}"><img alt="{{ listing.title }}" src="{{ listing.image_thumb_url }}" /></a>
+				<img alt="{{ listing.title }}" src="{{ listing.image_thumb_url }}" />
 				{% endfor %}
+				</a>
 				<a class="name" href="/mywatchlists/watchlist/{{ watchlist.id }}">{{ watchlist.name|e }}</a>
 			</li>
-		{% endfor %}
+			{% endfor %}
 			<li class="add-new">
 				<a href="/mywatchlists/watchlist"><img alt="Add new" src="/public/images/add-new.png" /></a>
 				<a class="name" href="/mywatchlists/watchlist">Create new watchlist</a>
