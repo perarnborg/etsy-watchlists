@@ -18,7 +18,7 @@ class EtsyUsers extends CacheableModel
 
     public function initialize()
     {
-        $this->hasMany('id', 'Watchlists', 'etsyusers_id', array(
+        $this->hasMany('id', 'Watchlists', 'etsy_users_id', array(
             'foreignKey' => array(
                 'action' => Relation::ACTION_CASCADE
             )

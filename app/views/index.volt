@@ -17,6 +17,7 @@
         <!--[if gte IE 9]><!-->
         {{ javascript_include('js/jquery-2.0.3.min.js') }}
         <!--<![endif]-->
+        {{ javascript_include('js/jquery.stringify.js') }}
         {{ javascript_include('js/application.js') }}
     </body>
 </html>

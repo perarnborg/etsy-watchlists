@@ -3,7 +3,8 @@ body {
 }
 .limiter {
 	margin: 0 auto;
-	max-width: 985px;
+	max-width: $limiter-max-width;
+	min-width: $limiter-min-width;
 }
 img {
 	max-width: 100%;

@@ -14,6 +14,25 @@ class MywatchlistsController extends ControllerBase
     {
         $this->view->setTemplateAfter('main');
         $this->view->etsyUser = $this->currentEtsyUser;
+        $watchlists = $this->currentEtsyUser->watchlists;
+        $watchlistListings = array();
+        foreach($watchlists as $watchlist) {
+            $watchlistListings[$watchlist->id] = $watchlist->getWatchlistsListings(array('limit' => 4));
+        }
+        $this->view->watchlists = $watchlists;
+        $this->view->watchlistListings = $watchlistListings;
+    }
+
+    public function watchlistAction($watchlistId = 0)
+    {
+        $this->view->setTemplateAfter('main');
+        $this->view->etsyUser = $this->currentEtsyUser;
+        if($watchlistId) {
+            $watchlist = Watchlists::findFirst($watchlistId);
+            $this->view->watchlist = $watchlist;
+            $this->view->watchlistParameters = $watchlist->watchlistsParameters;
+            $this->view->watchlistListings = $watchlist->watchlistsListings;
+        }
         $this->view->watchlists = $this->currentEtsyUser->watchlists;
         $this->view->categories = $this->listCategories();
         $this->view->countries = $this->listCountries();
@@ -27,6 +46,43 @@ class MywatchlistsController extends ControllerBase
         $shipsto = isset($_GET['shipsto']) ? $_GET['shipsto'] : false;
         $listings = $this->searchListings($keywords, $category, $shipsto);
         echo json_encode($listings);
+        die();
+    }
+
+    public function saveAction()
+    {
+        $watchlistInput = isset($_POST['watchlist']) ? json_decode($_POST['watchlist']) : null;
+        $errorMessage = false;
+        if($watchlistInput) {
+            $watchlist = new Watchlists();
+            $watchlist->etsy_users_id = $this->currentEtsyUser->id;
+            $watchlist->created = new Phalcon\Db\RawValue('now()');;
+            if($watchlistInput->id) {
+                $watchlist = Watchlists::findFirst(array($watchlistInput->id, "users_id =".$this->currentEtsyUser->id));
+            }
+            $watchlist->name = $watchlistInput->name;
+            if($watchlist->save() == false) {
+                var_dump($watchlist->getMessages());
+            } else {
+                try {
+                    // Set parameters
+                    $watchlist->setParameters($watchlistInput->watchlists_parameters);
+                    // Set listings if new watchlist
+                    $watchlist->setListings($watchlistInput->watchlists_listings);
+                    echo $watchlist->id;
+                    die();
+                } catch(Exception $ex) {
+                    if(!$watchlistInput->id) {
+                        $watchlist->delete();
+                    }
+                    $errorMessage = $ex->getMessage();
+                }
+            }
+        }
+        if(!$errorMessage) {
+            $errorMessage = "Could not save watchlist";
+        }
+        throw new Exception($errorMessage);
         die();
     }
 
@@ -55,12 +111,13 @@ class MywatchlistsController extends ControllerBase
             $data = $oauth->fetch($url, null, OAUTH_HTTP_METHOD_GET);
             $json = $oauth->getLastResponse();
             $listings = json_decode($json)->results;
+
             if($shipsto) {
                 $filteredResults = array();
-                foreach($results as $result) {
-                    foreach($result->ShippingInfo as $shipping) {
+                foreach($listings as $listing) {
+                    foreach($listing->ShippingInfo as $shipping) {
                         if($shipping->destination_country_id == null || $shipping->destination_country_name == $shipsto) {
-                            array_push($filteredResults, $result);
+                            array_push($filteredResults, $listing);
                         }
                     }
                 }

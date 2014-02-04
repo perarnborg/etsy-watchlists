@@ -1,3 +1,62 @@
+.watchlists {
+	ul {
+		@include reset-list();
+		margin: 0 -1%;
+	}
+	li {
+		@include box-sizing(border-box);
+		border: 1px solid $gray-light;
+		float: left;
+		margin: 0 1% 10px 1%;
+		padding: 10px;
+		width: 23%;
+		@media only screen and (max-width: $limiter-max-width) {
+			& {
+				width: 31%;
+			}
+		}
+		@media only screen and (max-width: $middle-max-width) {
+			& {
+				width: 45%;
+			}
+		}
+		@media only screen and (max-width: $narrow-max-width) {
+			& {
+				.name {
+					font-size: 0.75em;
+				}
+			}
+		}
+	}
+	.name {
+		clear: both;
+		display: block;
+		font-weight: bold;
+		overflow: hidden;
+		padding: 10px 0 0;
+		text-align: center;
+		text-transform: uppercase;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	img {
+		display: block;
+	}
+	.watchlist .name {
+		padding-top: 11px;
+	}
+	.watchlist img {
+		float: left;
+		margin: 8%;
+		width: 34%;
+		height: auto;
+	}
+	.add-new img {
+		@include opacity(0.4);
+		height: auto;
+		width: 100%;
+	}
+}
 .search-on-etsy {
 	float: left;
 	position: relative;
@@ -11,7 +70,7 @@
 		width: 70%;
 		.etsy-keywords {
 			height: 36px;
-			width: 84%;
+			width: 76%;
 		}
 		.button {
 			height: 36px;
@@ -47,7 +106,7 @@
 		width: 100%;
 		&.show {
 			@include opacity(1);
-			@include transition (opacity 0.3s ease-in-out 2s);
+			@include transition (opacity 0.3s ease-in-out 0.5s);
 		}
 	}
 }
@@ -106,6 +165,7 @@
 	li {
 		border: 1px solid $gray-light;
 		float: left;
+		height: 176px;
 		margin: 0 4px 14px 4px;
 		padding: 6px;
 		width: 172px;

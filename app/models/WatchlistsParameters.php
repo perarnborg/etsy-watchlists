@@ -22,6 +22,11 @@ class WatchlistsParameters extends Phalcon\Mvc\Model
      */
     public $value;
 
+    /**
+     * @var string
+     */
+    public $title;
+
     public function initialize()
     {
         $this->belongsTo('watchlists_id', 'Watchlists', 'id', array(
