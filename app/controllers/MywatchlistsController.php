@@ -34,12 +34,14 @@ class MywatchlistsController extends ControllerBase
             $this->view->watchlistParameters = $watchlist->watchlistsParameters;
             $this->view->watchlistListings = $watchlistsListings;
             // Set unviewed to viewed
-            foreach($watchlistsListings as $watchlistsListing) {
-                if(!$watchlistsListing->is_viewed) {
-                    $watchlist = Watchlists::findFirst($watchlistsListing->id);
-                    $watchlist->is_viewed = 1;
-                    $watchlist->save();
+            $unviewedListings = $watchlistsListings->filter(function($listing){
+                if($listing->is_viewed == 0) {
+                   return $listing;
                 }
+            });
+            if(count($unviewedListings) > 0) {
+                $phql = "Update WatchlistsListings SET is_viewed = 1 WHERE WatchlistsListings.watchlists_id = :watchlists_id:";
+                $result = $this->modelsManager->executeQuery($phql, array('watchlists_id' => $watchlist->id));
             }
         }
         $this->view->watchlists = $this->currentEtsyUser->watchlists;
@@ -72,7 +74,7 @@ class MywatchlistsController extends ControllerBase
             }
             $watchlist->name = $watchlistInput->name;
             if($watchlist->save() == false) {
-                var_dump($watchlist->getMessages());
+                $errorMessage = 'Could not watchlist: ' . implode(' | ', $watchlist->getMessages());
             } else {
                 try {
                     // Set parameters
@@ -104,74 +106,14 @@ class MywatchlistsController extends ControllerBase
     }
 
     private function searchListings($keywords, $category, $shipsto) {
-        $url = 'https://openapi.etsy.com/v2/listings/active?limit=40&includes=MainImage,Shop';
-        if($shipsto) {
-            $url .= ',ShippingInfo';
-        }
-        if($keywords) {
-            $url .= '&keywords=' . $keywords;
-        }
-        if($category) {
-            $url .= '&category=' . $category;
-        }
-        $oauth = new OAuth($this->config->api_key, $this->config->api_secret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
-        $oauth->setToken($this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret);
-        $listings = array();
-        try {
-            $data = $oauth->fetch($url, null, OAUTH_HTTP_METHOD_GET);
-            $json = $oauth->getLastResponse();
-            $listings = json_decode($json)->results;
-
-            if($shipsto) {
-                $filteredResults = array();
-                foreach($listings as $listing) {
-                    foreach($listing->ShippingInfo as $shipping) {
-                        if($shipping->destination_country_id == null || $shipping->destination_country_name == $shipsto) {
-                            array_push($filteredResults, $listing);
-                        }
-                    }
-                }
-                $listings = $filteredResults;
-            }
-        } catch (OAuthException $e) {
-            error_log($e->getMessage());
-            error_log(print_r($oauth->getLastResponse(), true));
-            error_log(print_r($oauth->getLastResponseInfo(), true));
-        }
-        return $listings;
+        return EtsyApi::listCategories($this->config->api_key, $this->config->api_secret, $this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret, $keywords, $category, $shipsto);
     }
 
     private function listCategories($categoryName = '') {
-        $url = 'https://openapi.etsy.com/v2/taxonomy/categories/'.$categoryName;
-        $oauth = new OAuth($this->config->api_key, $this->config->api_secret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
-        $oauth->setToken($this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret);
-        $categories = array();
-        try {
-            $data = $oauth->fetch($url, null, OAUTH_HTTP_METHOD_GET);
-            $json = $oauth->getLastResponse();
-            $categories = json_decode($json)->results;
-        } catch (OAuthException $e) {
-            error_log($e->getMessage());
-            error_log(print_r($oauth->getLastResponse(), true));
-            error_log(print_r($oauth->getLastResponseInfo(), true));
-        }
-        return $categories;
+        return EtsyApi::listCategories($this->config->api_key, $this->config->api_secret, $this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret, $categoryName);
     }
 
     private function listCountries() {
-        $url = 'https://openapi.etsy.com/v2/countries';
-        $oauth = new OAuth($this->config->api_key, $this->config->api_secret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
-        $oauth->setToken($this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret);
-        $countries = array();
-        try {
-            $data = $oauth->fetch($url, null, OAUTH_HTTP_METHOD_GET);
-            $json = $oauth->getLastResponse();
-            $countries = json_decode($json)->results;
-        } catch (OAuthException $e) {
-            error_log($e->getMessage());
-            error_log(print_r($oauth->getLastResponse(), true));
-            error_log(print_r($oauth->getLastResponseInfo(), true));
-        }
-        return $countries;
+        return EtsyApi::listCountries($this->config->api_key, $this->config->api_secret, $this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret);
     }
 }

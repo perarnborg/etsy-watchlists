@@ -96,6 +96,7 @@ app.Mywatchlists = function() {
         this.$settingsFormContainer = $('.settings-form-container');
         this.settingsFormSelector = '.modal .settings-form';
         this.watchlistNameSelector = '.modal .watchlist-name';
+        this.watchlistEmailIntervalSelector = '.modal .watchlist-email-interval';
         this.setup();
 		this.eventListeners();
     }
@@ -153,7 +154,7 @@ app.Mywatchlists.prototype.getWatchlistParameter = function(apiName) {
 
 app.Mywatchlists.prototype.getParameterId = function(apiName) {
 	for(var i = 0; i < this.parameters.length; i++) {
-		if(this.parameters[i].apiName == apiName) {
+		if(this.parameters[i].api_name == apiName) {
 			return this.parameters[i].id;
 		}
 	}
@@ -163,7 +164,7 @@ app.Mywatchlists.prototype.getParameterId = function(apiName) {
 app.Mywatchlists.prototype.getParameterApiName = function(id) {
 	for(var i = 0; i < this.parameters.length; i++) {
 		if(this.parameters[i].id == id) {
-			return this.parameters[i].apiName;
+			return this.parameters[i].api_name;
 		}
 	}
 	return false;
@@ -273,6 +274,7 @@ app.Mywatchlists.prototype.eventListeners = function() {
 		}
 		e.preventDefault();
 		self.watchlist.name = $(self.watchlistNameSelector).val();
+		self.watchlist.email_interval = $(self.watchlistEmailIntervalSelector).val() || null;
 		if(self.watchlist.name.length > 0) {
 			self.saveWatchlist();
 		}
@@ -357,5 +359,5 @@ app.Mywatchlists.prototype.getListingFromResponse = function(listingResponse) {
 };
 
 app.Mywatchlists.prototype.getListingMarkup = function(listing) {
-	return '<li'+(listing.is_viewed ? '' : 'class="listing-new"')+'><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><img src="'+listing.image_url+'" alt="'+listing.title+'" /></a><div class="listing-text clearfix"><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><h3 class="listing-title">'+listing.title+'</h3></a><a class="listing-shop" href="'+listing.shop_url+'" title="Checkout '+listing.shop_loginname+(listing.shop_loginname.toLowerCase().substr(listing.shop_loginname.length-1, 1) == 's' ? "'" : "'s")+' shop" target="_blank">'+listing.shop_loginname+'</a><span class="listing-price">'+listing.currency_code+' '+listing.price+'</span></div></li>';
+	return '<li'+(listing.is_viewed ? '' : ' class="listing-new"')+'><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><img src="'+listing.image_url+'" alt="'+listing.title+'" /></a><div class="listing-text clearfix"><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><h3 class="listing-title">'+listing.title+'</h3></a><a class="listing-shop" href="'+listing.shop_url+'" title="Checkout '+listing.shop_loginname+(listing.shop_loginname.toLowerCase().substr(listing.shop_loginname.length-1, 1) == 's' ? "'" : "'s")+' shop" target="_blank">'+listing.shop_loginname+'</a><span class="listing-price">'+listing.currency_code+' '+listing.price+'</span></div></li>';
 };

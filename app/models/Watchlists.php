@@ -61,17 +61,17 @@ class Watchlists extends Phalcon\Mvc\Model
         if(count($listings) == 0) {
             return;
         }
-        $listingsOld = $this->watchlistsListings->filter(function($listing) {
-            if ($listing->creation >= $listings[count($listings)]->creation) {
-                return $listing;
-            }
-        });
+        $lastListingCreation = $listings[count($listings) - 1]->creation;
+        var_dump($lastListingCreation);
+        $listingsOld = $this->watchlistsListings;
         foreach($listings as $listing) {
             $listingExists = false;
             foreach($listingsOld as $listingOld) {
+                var_dump('old', $listingsOld);
                 if($listingsOld->listing_id == $listing->listing_id ) {
                     $listingExists = true;
                 }
+                break;
             }
             if(!$listingExists) {
                 $listingNew = new WatchlistsListings();

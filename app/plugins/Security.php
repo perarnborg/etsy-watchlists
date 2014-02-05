@@ -59,6 +59,7 @@ class Security extends Plugin
 				'index' => array('index'),
 				'oauth' => array('index', 'access'),
 				'login' => array('index', 'start', 'end'),
+				'cronjob' => array('index', 'email'),
 			);
 			foreach ($publicResources as $resource => $actions) {
 				$acl->addResource(new Phalcon\Acl\Resource($resource), $actions);

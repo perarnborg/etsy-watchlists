@@ -55,7 +55,18 @@
 	<form class="settings-form" action="/mywatchlists/save" method="post">
 		<input type="hidden" name="watchlist" class="watchlist-data" />
 		<p>
-		<input type="text" placeholder="Watchlist name" class="watchlist-name" value="{{ watchlist.name }}" />
+			<label for="settings-watchlist-name">Watchlist name</label>
+			<input type="text" placeholder="Enter a name for your wathclist" id="settings-watchlist-name" class="watchlist-name" value="{{ watchlist.name }}" />
+		</p>
+		<p>
+			<label for="settings-watchlist-email-interval">How often do you want to recieve an email?</label>
+			<select id="settings-watchlist-email-interval" class="watchlist-email-interval">
+				<option value="">Never</option>
+				<option value="86400"{% if watchlist.email_interval == 86400 %} selected="selected"{% endif %}>Every day</option>
+				<option value="302400"{% if watchlist.email_interval == 302400 %} selected="selected"{% endif %}>Twice a week</option>
+				<option value="604800"{% if watchlist.email_interval == 604800 %} selected="selected"{% endif %}>Once a week</option>
+				<option value="2592000"{% if watchlist.email_interval == 2592000 %} selected="selected"{% endif %}>Once a month</option>
+			</select>
 		</p>
 		<input type="submit" value="Save Watchlist" />
 	</form>
@@ -64,7 +75,7 @@
 	var parameters = [
 	{% for index, parameter in parameters %}
 	{{ index > 0 ? ',' : '' }}
-	{ id: {{ parameter.id }}, name: '{{ parameter.name }}', apiName: '{{ parameter.apiName }}', valueType: '{{ parameter.valueType }}' }
+	{ id: {{ parameter.id }}, name: '{{ parameter.name }}', api_name: '{{ parameter.api_name }}', valueType: '{{ parameter.value_type }}' }
 	{% endfor %}
 	];
 	{% if watchlist %}
@@ -94,7 +105,7 @@
 				currency_code: '{{ listing.currency_code }}',
 				price: '{{ listing.price }}',
 				creation: '{{ listing.creation }}',
-				is_viewed: '{{ listing.is_viewed }}'
+				is_viewed: {{ listing.is_viewed }}
 			}
 			{% endfor %}
 		]

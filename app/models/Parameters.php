@@ -15,12 +15,12 @@ class Parameters extends Phalcon\Mvc\Model
     /**
      * @var string
      */
-    public $apiName;
+    public $api_name;
 
     /**
      * @var string
      */
-    public $valueType;
+    public $value_type;
 
     public function initialize()
     {
