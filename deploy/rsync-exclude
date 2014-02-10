@@ -4,6 +4,7 @@
 .project
 .settings
 deploy
+README.md
 .buildpath
 *~
 *.bkp
