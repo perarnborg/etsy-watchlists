@@ -29,7 +29,7 @@ class MywatchlistsController extends ControllerBase
         $this->view->etsyUser = $this->currentEtsyUser;
         if($watchlistId) {
             $watchlist = Watchlists::findFirst($watchlistId);
-            $watchlistsListings = $watchlist->watchlistsListings;
+            $watchlistsListings = $watchlist->getWatchlistsListings(array("order" => "creation DESC"));
             $this->view->watchlist = $watchlist;
             $this->view->watchlistParameters = $watchlist->watchlistsParameters;
             $this->view->watchlistListings = $watchlistsListings;

@@ -1,5 +1,6 @@
 <?php
 use Phalcon\Mvc\Model\Relation;
+use Phalcon\Mvc\Model\Resultset;
 class Watchlists extends Phalcon\Mvc\Model
 {
     /**
@@ -25,7 +26,7 @@ class Watchlists extends Phalcon\Mvc\Model
     /**
      * @var int
      */
-    public $last_email;
+    public $last_emailed;
 
     /**
      * @var int
@@ -62,16 +63,15 @@ class Watchlists extends Phalcon\Mvc\Model
             return;
         }
         $lastListingCreation = $listings[count($listings) - 1]->creation;
-        var_dump($lastListingCreation);
-        $listingsOld = $this->watchlistsListings;
+        $listingsExisting = $this->getWatchlistsListings(array(
+            "creation > " . ($lastListingCreation - 1)
+        ));
         foreach($listings as $listing) {
             $listingExists = false;
-            foreach($listingsOld as $listingOld) {
-                var_dump('old', $listingsOld);
-                if($listingsOld->listing_id == $listing->listing_id ) {
+            foreach($listingsExisting as $key=>$listingExisting) {
+                if($listingExisting->listing_id == $listing->listing_id ) {
                     $listingExists = true;
                 }
-                break;
             }
             if(!$listingExists) {
                 $listingNew = new WatchlistsListings();
@@ -86,6 +86,8 @@ class Watchlists extends Phalcon\Mvc\Model
                 $listingNew->currency_code = $listing->currency_code;
                 $listingNew->price = $listing->price;
                 $listingNew->creation = $listing->creation;
+                $listingNew->is_viewed = 0;
+                $listingNew->is_emailed = 0;
                 if($listingNew->save() == false) {
                     throw new Exception('Could not update listing: ' . implode(' | ', $listingNew->getMessages()));
                 }
@@ -95,7 +97,7 @@ class Watchlists extends Phalcon\Mvc\Model
 
     public function setParameters($parameters)
     {
-        $parametersOld = $this->watchlistsParameters;
+        $parametersOld = $this->getWatchlistsParameters();
         $existingOldParameterIndexes = array();
         foreach($parameters as $parameter) {
             $parameterExists = false;

@@ -29,6 +29,7 @@ class OauthController extends ControllerBase
 
         // Redirect to Etsy
         header('Location: ' . $req_token['login_url']);
+        die();
     }
 
     public function AccessAction()
@@ -75,8 +76,10 @@ class OauthController extends ControllerBase
         }
 
         // Create or update Etsy user
-        $etsyUser = EtsyUsers::findFirst("etsyid = ".$user->user_id);
-        var_dump($etsyUser);
+        $etsyUser = EtsyUsers::findFirst(array(
+            "etsyid = :etsy_user_id:",
+            "bind" => array("etsy_user_id" => $user->user_id)
+        ));
         if($etsyUser) {
             // Update if changed
             $isUpdated = false;
@@ -107,5 +110,6 @@ class OauthController extends ControllerBase
         ));
 
         header('Location: /mywatchlists');
+        die();
     }
 }

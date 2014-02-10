@@ -353,7 +353,8 @@ app.Mywatchlists.prototype.getListingFromResponse = function(listingResponse) {
 		currency_code: listingResponse.currency_code,
 		price: listingResponse.price,
 		creation: listingResponse.creation_tsz,
-		is_viewed: 1
+		is_viewed: 1,
+		is_emailed: 0
 	};
 	return listing;
 };

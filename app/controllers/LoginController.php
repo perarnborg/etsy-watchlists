@@ -76,7 +76,10 @@ class LoginController extends ControllerBase
             $password = $this->request->getPost('password');
             $password = sha1($password);
 
-            $user = Users::findFirst("email='$email' AND password='$password' AND active='Y'");
+            $user = Users::findFirst(array(
+                "email = :email: AND password = :password: AND active='Y'",
+                "bind" => array("email" => $email, "password" => $password)
+            ));
             if ($user != false) {
                 $this->_registerSession($user);
                 $this->flash->success('Welcome ' . $user->email);
@@ -84,7 +87,10 @@ class LoginController extends ControllerBase
             }
 
             $username = $this->request->getPost('email', 'alphanum');
-            $user = Users::findFirst("username='$username' AND password='$password' AND active='Y'");
+            $user = Users::findFirst(array(
+                "username = :username: AND password = :password: AND active='Y'",
+                "bind" => array('username' => $username, 'password' => $password)
+            ));
             if ($user != false) {
                 $this->_registerSession($user);
                 $this->flash->success('Welcome ' . $user->name);

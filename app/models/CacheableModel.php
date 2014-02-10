@@ -4,7 +4,7 @@ class CacheableModel extends Phalcon\Mvc\Model
 {
     protected static $_loadedOnce = array();
 
-    protected static function _getKey($functionName, $parameters)
+    protected static function _getKey($functionName, $parameters = array())
     {
         $uniqueKey = array($functionName);
         if($parameters != null) {
@@ -16,7 +16,7 @@ class CacheableModel extends Phalcon\Mvc\Model
                     $uniqueKey[] = $key . ':' . $value;
                 } else {
                     if (is_array($value)) {
-                        $uniqueKey[] = $key . ':[' . self::_createKey($value) .']';
+                        $uniqueKey[] = $key . ':[' . self::_getKey('parameter', $value) .']';
                     }
                 }
             }
