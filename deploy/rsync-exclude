@@ -14,3 +14,4 @@ public/css/_*
 .sass-cache
 schemas
 public/email_templates
+app/config
