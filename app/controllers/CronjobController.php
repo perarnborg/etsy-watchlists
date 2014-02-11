@@ -35,13 +35,16 @@ class CronjobController extends ControllerBase
 						break;
 				}
 			}
+			$listings = array();
+			$newListingsCount = 0;
 			if($keywords) {
 				$listings = EtsyApi::searchListings($this->config->api_key, $this->config->api_secret, $etsyUser->etsy_token, $etsyUser->etsy_secret, $keywords, $category, $shipsto);
 				$listings = EtsyApi::parseListings($listings);
-				$watchlist->setListings($listings);
+				$watchlist->setListings($listings, $newListingsCount);
 			}
 			$watchlist->last_checked = time();
 			$watchlist->save();
+			echo $watchlist->name . ' ' . $newListingsCount.'<br/>';
 		}
 		die();
     }

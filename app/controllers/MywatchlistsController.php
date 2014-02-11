@@ -5,7 +5,8 @@ class MywatchlistsController extends ControllerBase
     {
         $config = new Phalcon\Config\Adapter\Ini(__DIR__ . '/../config/config.ini');
         $this->config = $config->etsy;
-        $etsyuser_id = $this->session->get('auth')['etsyuser_id'];
+        $auth = $this->session->get('auth');
+        $etsyuser_id = $auth['etsyuser_id'];
         $this->currentEtsyUser = EtsyUsers::findFirst($etsyuser_id);
         $this->parameters = Parameters::find();
     }
@@ -30,9 +31,9 @@ class MywatchlistsController extends ControllerBase
         if($watchlistId) {
             $watchlist = Watchlists::findFirst($watchlistId);
             $watchlistsListings = $watchlist->getWatchlistsListings(array("order" => "creation DESC"));
-            $this->view->watchlist = $watchlist;
-            $this->view->watchlistParameters = $watchlist->watchlistsParameters;
-            $this->view->watchlistListings = $watchlistsListings;
+            $this->view->currentWatchlist = $watchlist;
+            $this->view->currentWatchlistParameters = $watchlist->watchlistsParameters;
+            $this->view->currentWatchlistListings = $watchlistsListings;
             // Set unviewed to viewed
             $unviewedListings = $watchlistsListings->filter(function($listing){
                 if($listing->is_viewed == 0) {
@@ -106,7 +107,7 @@ class MywatchlistsController extends ControllerBase
     }
 
     private function searchListings($keywords, $category, $shipsto) {
-        return EtsyApi::listCategories($this->config->api_key, $this->config->api_secret, $this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret, $keywords, $category, $shipsto);
+        return EtsyApi::searchListings($this->config->api_key, $this->config->api_secret, $this->currentEtsyUser->etsy_token, $this->currentEtsyUser->etsy_secret, $keywords, $category, $shipsto);
     }
 
     private function listCategories($categoryName = '') {

@@ -33,7 +33,7 @@ class EtsyApi {
         if($category) {
             $path .= '&category=' . $category;
         }
-        $listings = self::makeRequest($apiKey, $apiSecret, $oauthToken, $oauthSecret, $path);
+        $listings = self::makeRequest($apiKey, $apiSecret, $oauthToken, $oauthSecret, $path, true);
         if($shipsto) {
             $filteredResults = array();
             foreach($listings as $listing) {
@@ -60,7 +60,7 @@ class EtsyApi {
         return $countries;
     }
 
-	private static function makeRequest($apiKey, $apiSecret, $oauthToken, $oauthSecret, $path) {
+	private static function makeRequest($apiKey, $apiSecret, $oauthToken, $oauthSecret, $path, $debug = false) {
         $url = self::API_BASE . $path;
         $oauth = new OAuth($apiKey, $apiSecret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
         $oauth->setToken($oauthToken, $oauthSecret);
@@ -70,9 +70,11 @@ class EtsyApi {
             $json = $oauth->getLastResponse();
             $results = json_decode($json)->results;
         } catch (OAuthException $e) {
-            error_log($e->getMessage());
-            error_log(print_r($oauth->getLastResponse(), true));
-            error_log(print_r($oauth->getLastResponseInfo(), true));
+            if($debug) {
+                error_log($e->getMessage());
+                error_log(print_r($oauth->getLastResponse(), true));
+                error_log(print_r($oauth->getLastResponseInfo(), true));
+            }
         }
         return $results;
 	}

@@ -57,7 +57,7 @@ class Watchlists extends Phalcon\Mvc\Model
         ));
     }
 
-    public function setListings($listings)
+    public function setListings($listings, &$newListingsCount = 0)
     {
         if(count($listings) == 0) {
             return;
@@ -91,6 +91,7 @@ class Watchlists extends Phalcon\Mvc\Model
                 if($listingNew->save() == false) {
                     throw new Exception('Could not update listing: ' . implode(' | ', $listingNew->getMessages()));
                 }
+                $newListingsCount++;
             }
         }
     }

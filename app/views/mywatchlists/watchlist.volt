@@ -56,16 +56,16 @@
 		<input type="hidden" name="watchlist" class="watchlist-data" />
 		<p>
 			<label for="settings-watchlist-name">Watchlist name</label>
-			<input type="text" placeholder="Enter a name for your wathclist" id="settings-watchlist-name" class="watchlist-name" value="{{ watchlist.name }}" />
+			<input type="text" placeholder="Enter a name for your watchlist" id="settings-watchlist-name" class="watchlist-name"{% if watchlist is defined %} value="{{ watchlist.name }}"{% endif %} />
 		</p>
 		<p>
 			<label for="settings-watchlist-email-interval">How often do you want to recieve an email?</label>
 			<select id="settings-watchlist-email-interval" class="watchlist-email-interval">
 				<option value="">Never</option>
-				<option value="86400"{% if watchlist.email_interval == 86400 %} selected="selected"{% endif %}>Every day</option>
-				<option value="302400"{% if watchlist.email_interval == 302400 %} selected="selected"{% endif %}>Twice a week</option>
-				<option value="604800"{% if watchlist.email_interval == 604800 %} selected="selected"{% endif %}>Once a week</option>
-				<option value="2592000"{% if watchlist.email_interval == 2592000 %} selected="selected"{% endif %}>Once a month</option>
+				<option value="86400"{% if watchlist is defined %}{% if watchlist.email_interval == 86400 %} selected="selected"{% endif %}{% endif %}>Every day</option>
+				<option value="302400"{% if watchlist is defined %}{% if watchlist.email_interval == 302400 %} selected="selected"{% endif %}{% endif %}>Twice a week</option>
+				<option value="604800"{% if watchlist is defined %}{% if watchlist.email_interval == 604800 %} selected="selected"{% endif %}{% endif %}>Once a week</option>
+				<option value="2592000"{% if watchlist is defined %}{% if watchlist.email_interval == 2592000 %} selected="selected"{% endif %}{% endif %}>Once a month</option>
 			</select>
 		</p>
 		<input type="submit" value="Save Watchlist" />
@@ -78,11 +78,11 @@
 	{ id: {{ parameter.id }}, name: '{{ parameter.name }}', api_name: '{{ parameter.api_name }}', valueType: '{{ parameter.value_type }}' }
 	{% endfor %}
 	];
-	{% if watchlist %}
+	{% if currentWatchlist is defined %}
 	var watchlist = {
-		name: '{{watchlist.name}}',
+		name: '{{currentWatchlist.name}}',
 		watchlists_parameters: [
-			{% for index, parameter in watchlistParameters %}
+			{% for index, parameter in currentWatchlistParameters %}
 			{{ index > 0 ? ',' : '' }}
 			{
 				parameters_id: {{ parameter.parameters_id }},
@@ -92,7 +92,7 @@
 			{% endfor %}
 		],
 		watchlists_listings: [
-			{% for index, listing in watchlistListings %}
+			{% for index, listing in currentWatchlistListings %}
 			{{ index > 0 ? ',' : '' }}
 			{
 				listing_id: {{listing.listing_id}},
