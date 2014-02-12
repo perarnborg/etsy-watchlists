@@ -21,16 +21,12 @@ class CacheableModel extends Phalcon\Mvc\Model
                 }
             }
         }
-        return join('_', $uniqueKey);
+        return md5(join('_', $uniqueKey));
     }
 
-    private static function _getCached($key, $parameters) {
+    private static function _getCached($key) {
         if (!isset(self::$_loadedOnce[$key])) { // Check memory
-            if(false && apc_exists(get_class(self).'_'.$key)) { // Check cache
-                self::$_loadedOnce[$key] = apc_fetch($key);
-            } else {
-                return null;
-            }
+            self::$_loadedOnce[$key] = FileCache::getCache($key);
         }
         return self::$_loadedOnce[$key];
     }
@@ -38,28 +34,24 @@ class CacheableModel extends Phalcon\Mvc\Model
     public static function find($parameters=null)
     {
         $key = self::_getKey('find', $parameters);
-        if($cached = self::_getCached($key, $parameters) !== null) {
+        if(($cached = self::_getCached($key)) !== null) {
             return $cached;
         }
         $data = parent::find($parameters);
         self::$_loadedOnce[$key] = $data;
-        if(false) {
-            apc_store(get_class(self).'_'.$key, $data);
-        }
+        FileCache::setCache($key, $data);
         return $data;
     }
 
     public static function findFirst($parameters=null)
     {
         $key = self::_getKey('findAll', $parameters);
-        if($cached = self::_getCached($key, $parameters) !== null) {
+        if(($cached = self::_getCached($key)) !== null) {
             return $cached;
         }
         $data = parent::findFirst($parameters);
         self::$_loadedOnce[$key] = $data;
-        if(false) {
-            apc_store(get_class(self).'_'.$key, $data);
-        }
+        FileCache::setCache($key, $data);
         return $data;
     }
 }

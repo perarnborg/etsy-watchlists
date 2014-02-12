@@ -15,7 +15,10 @@ class MywatchlistsController extends ControllerBase
     {
         $this->view->setTemplateAfter('main');
         $this->view->etsyUser = $this->currentEtsyUser;
-        $watchlists = $this->currentEtsyUser->watchlists;
+        $watchlists = watchlists::find(array(
+            "etsy_users_id = :etsy_users_id:",
+            "bind" => array("etsy_users_id" => $this->currentEtsyUser->id)
+        ));
         $watchlistListings = array();
         foreach($watchlists as $watchlist) {
             $watchlistListings[$watchlist->id] = $watchlist->getWatchlistsListings(array(
@@ -40,7 +43,10 @@ class MywatchlistsController extends ControllerBase
                 $this->view->currentWatchlistListings = $watchlistsListings;
             }
         }
-        $this->view->watchlists = $this->currentEtsyUser->watchlists;
+        $this->view->watchlists = watchlists::find(array(
+            "etsy_users_id = :etsy_users_id:",
+            "bind" => array("etsy_users_id" => $this->currentEtsyUser->id)
+        ));
         $this->view->categories = $this->listCategories();
         $this->view->countries = $this->listCountries();
         $this->view->parameters = $this->parameters;

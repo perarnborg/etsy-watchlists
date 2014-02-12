@@ -1,6 +1,6 @@
 <?php
 use Phalcon\Mvc\Model\Relation;
-class Parameters extends Phalcon\Mvc\Model
+class Parameters extends CacheableModel
 {
     /**
      * @var integer
