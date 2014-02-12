@@ -18,7 +18,10 @@ class MywatchlistsController extends ControllerBase
         $watchlists = $this->currentEtsyUser->watchlists;
         $watchlistListings = array();
         foreach($watchlists as $watchlist) {
-            $watchlistListings[$watchlist->id] = $watchlist->getWatchlistsListings(array('limit' => 4));
+            $watchlistListings[$watchlist->id] = $watchlist->getWatchlistsListings(array(
+                'limit' => 4,
+                'order' => 'creation DESC'
+            ));
         }
         $this->view->watchlists = $watchlists;
         $this->view->watchlistListings = $watchlistListings;
@@ -30,19 +33,11 @@ class MywatchlistsController extends ControllerBase
         $this->view->etsyUser = $this->currentEtsyUser;
         if($watchlistId) {
             $watchlist = Watchlists::findFirst($watchlistId);
-            $watchlistsListings = $watchlist->getWatchlistsListings(array("order" => "creation DESC"));
-            $this->view->currentWatchlist = $watchlist;
-            $this->view->currentWatchlistParameters = $watchlist->watchlistsParameters;
-            $this->view->currentWatchlistListings = $watchlistsListings;
-            // Set unviewed to viewed
-            $unviewedListings = $watchlistsListings->filter(function($listing){
-                if($listing->is_viewed == 0) {
-                   return $listing;
-                }
-            });
-            if(count($unviewedListings) > 0) {
-                $phql = "Update WatchlistsListings SET is_viewed = 1 WHERE WatchlistsListings.watchlists_id = :watchlists_id:";
-                $result = $this->modelsManager->executeQuery($phql, array('watchlists_id' => $watchlist->id));
+            if($watchlist->etsy_users_id == $this->currentEtsyUser->id) {
+                $watchlistsListings = $watchlist->getWatchlistsListings(array("order" => "creation DESC"));
+                $this->view->currentWatchlist = $watchlist;
+                $this->view->currentWatchlistParameters = $watchlist->watchlistsParameters;
+                $this->view->currentWatchlistListings = $watchlistsListings;
             }
         }
         $this->view->watchlists = $this->currentEtsyUser->watchlists;
@@ -61,21 +56,36 @@ class MywatchlistsController extends ControllerBase
         die();
     }
 
+    public function setlistingsasviewedAction($watchlistId = 0)
+    {
+        if($watchlistId) {
+            $watchlist = Watchlists::findFirst($watchlistId);
+            if($watchlist->etsy_users_id == $this->currentEtsyUser->id) {
+                $phql = "Update WatchlistsListings SET is_viewed = 1 WHERE WatchlistsListings.watchlists_id = :watchlists_id:";
+                $result = $this->modelsManager->executeQuery($phql, array('watchlists_id' => $watchlistId));
+            }
+        }
+        die();
+    }
+
     public function saveAction()
     {
         $watchlistInput = isset($_POST['watchlist']) ? json_decode($_POST['watchlist']) : null;
         $errorMessage = false;
-        if($watchlistInput) {
+        if($watchlistInput && $watchlistInput->name) {
             $watchlist = new Watchlists();
             $watchlist->etsy_users_id = $this->currentEtsyUser->id;
-            $watchlist->last_checked = new Phalcon\Db\RawValue('now()');;
-            $watchlist->created = new Phalcon\Db\RawValue('now()');;
             if($watchlistInput->id) {
                 $watchlist = Watchlists::findFirst(array($watchlistInput->id, "users_id =".$this->currentEtsyUser->id));
+            } else {
+                $watchlist->last_checked = new Phalcon\Db\RawValue('now()');;
+                $watchlist->created = new Phalcon\Db\RawValue('now()');;
             }
             $watchlist->name = $watchlistInput->name;
+            $watchlist->email_interval =
+            $watchlistInput->email_interval;
             if($watchlist->save() == false) {
-                $errorMessage = 'Could not watchlist: ' . implode(' | ', $watchlist->getMessages());
+                $errorMessage = 'Could not save watchlist: ' . implode(' | ', $watchlist->getMessages());
             } else {
                 try {
                     // Set parameters

@@ -212,5 +212,6 @@ class CronjobController extends ControllerBase
 		$headers .= "Content-Type: text/html; charset=utf-8\r\n";
 		echo $message;
 		mail($to, $subject, $message, $headers);
+		var_dump($to, $subject, $headers);
     }
 }

@@ -37,9 +37,11 @@ class EtsyApi {
         if($shipsto) {
             $filteredResults = array();
             foreach($listings as $listing) {
-                foreach($listing->ShippingInfo as $shipping) {
-                    if($shipping->destination_country_id == null || $shipping->destination_country_name == $shipsto) {
-                        array_push($filteredResults, $listing);
+                if(isset($listing->ShippingInfo)) {
+                    foreach($listing->ShippingInfo as $shipping) {
+                        if($shipping->destination_country_id == null || $shipping->destination_country_name == $shipsto) {
+                            array_push($filteredResults, $listing);
+                        }
                     }
                 }
             }

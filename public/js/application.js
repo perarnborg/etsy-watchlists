@@ -115,7 +115,7 @@ app.Mywatchlists.prototype.setup = function() {
     if(typeof(this.watchlist) == 'undefined') {
 		this.watchlist = {id: 0, name: '', watchlists_parameters: [], watchlists_listings: []};
     } else {
-		this.$saveButton.val('Update<br>watchlist');
+		this.$saveButton.html('Update<br>watchlist').addClass('show');
 		$('h1').html(this.watchlist.name);
 
 		for(var i = 0; i < this.watchlist.watchlists_parameters.length; i++) {
@@ -131,15 +131,28 @@ app.Mywatchlists.prototype.setup = function() {
 			}
 		}
 		var results = '';
+		var hasUnviewed = false;
 		for(var j = 0; j < this.watchlist.watchlists_listings.length; j++) {
 			results += this.getListingMarkup(this.watchlist.watchlists_listings[j]);
+			if(!this.watchlist.watchlists_listings[j].is_viewed) {
+				hasUnviewed = true;
+			}
 		}
 		if(this.watchlist.watchlists_listings.length === 0) {
 			results += '<li>No listings where found for this search.</li>';
 		}
 		this.$searchResultsList.html(results);
+		if(hasUnviewed) {
+			this.setListingsAsViewed();
+		}
     }
+};
 
+app.Mywatchlists.prototype.setListingsAsViewed = function() {
+	var url = '/mywatchlists/setlistingsasviewed/'+this.watchlist.id;
+	$.ajax({
+		url: url
+	});
 };
 
 app.Mywatchlists.prototype.getWatchlistParameter = function(apiName) {
@@ -246,7 +259,7 @@ app.Mywatchlists.prototype.eventListeners = function() {
 	$(self.$shipsto).change(function(){
 		var value = $(this).val();
 		if(value) {
-			self.addFilter('shipsto', value, false, true);
+			self.addFilter('shipsto', value, 'Ships to ' + value, true);
 		} else {
 			self.removeFilter('shipsto', true);
 		}
@@ -267,14 +280,14 @@ app.Mywatchlists.prototype.eventListeners = function() {
 		app.modal.openModal(self.$settingsFormContainer);
 	});
 	$(document).on('submit', self.settingsFormSelector, function(e) {
+		self.watchlist.name = $(self.watchlistNameSelector).val();
+		self.watchlist.email_interval = $(self.watchlistEmailIntervalSelector).val() || null;
 		if(false) {
 			self.watchlist.name = $(self.watchlistNameSelector).val();
 			$('.watchlist-data').val($.stringify(self.watchlist));
 			return true;
 		}
 		e.preventDefault();
-		self.watchlist.name = $(self.watchlistNameSelector).val();
-		self.watchlist.email_interval = $(self.watchlistEmailIntervalSelector).val() || null;
 		if(self.watchlist.name.length > 0) {
 			self.saveWatchlist();
 		}
@@ -324,7 +337,6 @@ app.Mywatchlists.prototype.saveWatchlist = function() {
 	var watchlist = $.stringify(self.watchlist);
 	var url = '/mywatchlists/save';
 	self.$saveButton.addClass('loading');
-	console.log(url);
 	$.ajax({
 		type: "POST",
 		url: url,

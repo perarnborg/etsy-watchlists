@@ -1,4 +1,3 @@
-
 <div class="clearfix">
 	<div class="search-on-etsy">
 		{{ content() }}
@@ -46,7 +45,10 @@
 		<h3>Existing Watchlists</h3>
 		<ul>
 		{% for watchlist in watchlists %}
-			<li>{{ watchlist.name|e }}</li>
+			<li{% if currentWatchlist is defined %}{% if currentWatchlist.id == watchlist.id %} class="current"{% endif %}{% endif %}><a href="/mywatchlists/watchlist/{{ watchlist.id }}">{{ watchlist.name|e }}</a></li>
+			{% if currentWatchlist is defined %}
+			<li><a href="/mywatchlists/watchlist">Create new watchlist</a></li>
+			{% endif %}
 		{% endfor %}
 		</ul>
 	</div>
@@ -80,6 +82,7 @@
 	];
 	{% if currentWatchlist is defined %}
 	var watchlist = {
+		id: {{currentWatchlist.id}},
 		name: '{{currentWatchlist.name}}',
 		watchlists_parameters: [
 			{% for index, parameter in currentWatchlistParameters %}

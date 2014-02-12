@@ -211,4 +211,14 @@
 .my-watchlists {
 	float: right;
 	width: 20%;
+	ul {
+		@include reset-list();
+		padding-top: 5px;
+	}
+	li {
+		margin: 10px 0 5px 0;
+		&.current {
+			font-weight: bold;
+		}
+	}
 }

@@ -8,7 +8,7 @@ README.md
 .buildpath
 *~
 *.bkp
-cache/*
+cache
 public/css/_*
 .DS_Store
 .sass-cache

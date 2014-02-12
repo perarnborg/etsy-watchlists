@@ -98,18 +98,18 @@ class Watchlists extends Phalcon\Mvc\Model
 
     public function setParameters($parameters)
     {
-        $parametersOld = $this->getWatchlistsParameters();
+        $parametersExisting = $this->getWatchlistsParameters();
         $existingOldParameterIndexes = array();
         foreach($parameters as $parameter) {
             $parameterExists = false;
-            foreach($parametersOld as $index=>$parameterOld) {
-                if($parametersOld->parameters_id == $parameter->parameter_id ) {
+            foreach($parametersExisting as $index=>$parameterExisting) {
+                if($parameterExisting->parameters_id == $parameter->parameters_id ) {
                     $parameterExists = true;
                     array_push($existingOldParameterIndexes, $index);
-                    $parametersOld->value = $parameter->value;
-                    $parametersOld->title = $parameter->title;
-                    if($parametersOld->save() == false) {
-                        throw new Exception('Could not update parameter: ' . implode(' | ', $parametersOld->getMessages()));
+                    $parameterExisting->value = $parameter->value;
+                    $parameterExisting->title = $parameter->title;
+                    if($parameterExisting->save() == false) {
+                        throw new Exception('Could not update parameter: ' . implode(' | ', $parameterExisting->getMessages()));
                     }
                 }
             }
@@ -118,14 +118,15 @@ class Watchlists extends Phalcon\Mvc\Model
                 $parameterNew->watchlists_id = $this->id;
                 $parameterNew->parameters_id = $parameter->parameters_id;
                 $parameterNew->value = $parameter->value;
+                $parameterNew->title = $parameter->title;
                 if($parameterNew->save() == false) {
                     throw new Exception('Could not create parameter: ' . implode(' | ', $parameterNew->getMessages()));
                 }
             }
         }
-        foreach($parametersOld as $index=>$parametersOld) {
+        foreach($parametersExisting as $index=>$parameterExisting) {
             if(!in_array($index, $existingOldParameterIndexes)) {
-                $parametersOld->delete();
+                $parameterExisting->delete();
             }
         }
     }
