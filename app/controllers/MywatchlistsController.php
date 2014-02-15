@@ -43,14 +43,17 @@ class MywatchlistsController extends ControllerBase
                 $format = isset($_GET['format']) ? (int)$_GET['format'] : 'html';
                 $watchlistsListings = $watchlist->getWatchlistsListings(array(
                     "order" => "creation DESC",
-                    "limit" => array("number" => $pageSize, "offset" => $offset),
-                    "hydration" => Resultset::HYDRATE_OBJECTS
+                    "limit" => array("number" => $pageSize, "offset" => $offset)
                 ));
                 if($format == 'json') {
-                    $json = '';
+                    $json = '[';
                     foreach($watchlistsListings as $listing){
+                        if(strlen($json) > 1) {
+                            $json .= ',';
+                        }
                         $json .= json_encode($listing);
                     };
+                    $json .= ']';
                     echo $json;
                     die();
                 }
@@ -87,6 +90,7 @@ class MywatchlistsController extends ControllerBase
                 $phql = "Update WatchlistsListings SET is_viewed = 1 WHERE WatchlistsListings.watchlists_id = :watchlists_id:";
                 $result = $this->modelsManager->executeQuery($phql, array('watchlists_id' => $watchlistId));
             }
+            WatchlistsListings::clearWatchlistCache($watchlistId);
         }
         die();
     }
@@ -115,6 +119,12 @@ class MywatchlistsController extends ControllerBase
                     $watchlist->setParameters($watchlistInput->watchlists_parameters);
                     // Set listings if new watchlist
                     $watchlist->setListings($watchlistInput->watchlists_listings);
+                    if($watchlistInput->id) {
+                        Watchlists::clearGetCache($watchlistInput->id);
+                        // Clear WP and WL cache if updated
+                    } else {
+                        Watchlists::flushCache();
+                    }
                     echo $watchlist->id;
                     die();
                 } catch(Exception $ex) {

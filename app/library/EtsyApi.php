@@ -8,12 +8,12 @@ class EtsyApi {
         $frontCache = new Phalcon\Cache\Frontend\Data(array(
             "lifetime" => 3500
         ));
-        if($config->cache == 'memory') {
-            $cache = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+        if($config->cache->method == 'memory') {
+            $cache = new Phalcon\Cache\Backend\Memcache($frontCache, array(
                 "host" => "localhost",
                 "port" => "11211"
             ));
-        } else if($config->cache == 'file') {
+        } else if($config->cache->method == 'file') {
             $cache = new Phalcon\Cache\Backend\File($frontCache, array(
                 "cacheDir" => "../app/cache/file/"
             ));
@@ -22,7 +22,7 @@ class EtsyApi {
     }
 
     private static function getCacheKey($url){
-        return md5(get_called_class().'_'.$url;
+        return md5(get_called_class().'_'.$url);
     }
 
     public static function parseListings($listingsResponse) {
@@ -106,7 +106,7 @@ class EtsyApi {
             }
         }
         if($cache) {
-            $cache->save(self::getCacheKey($url), $data);
+            $cache->save(self::getCacheKey($url), $results);
         }
         return $results;
 	}

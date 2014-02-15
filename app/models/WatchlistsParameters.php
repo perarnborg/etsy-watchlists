@@ -40,4 +40,11 @@ class WatchlistsParameters extends CacheableModel
             )
         ));
     }
+
+    public static function clearWatchlistCache($watchlistId) {
+        $cache = self::getCache();
+        if($cache) {
+            // TODO: this and like wise in watchlist listings?
+        }
+    }
 }

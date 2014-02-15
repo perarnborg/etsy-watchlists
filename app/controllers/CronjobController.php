@@ -10,7 +10,7 @@ class CronjobController extends ControllerBase
 
     public function indexAction()
     {
-
+    	$newListingsCount = 0;
     	$watchlists = Watchlists::query()
 		    ->where("last_checked < :one_hour_ago:")
 		    ->bind(array("one_hour_ago" => time() - 3600))
@@ -36,15 +36,19 @@ class CronjobController extends ControllerBase
 				}
 			}
 			$listings = array();
-			$newListingsCount = 0;
+			$watchlistNewListingsCount = 0;
 			if($keywords) {
 				$listings = EtsyApi::searchListings($this->config->api_key, $this->config->api_secret, $etsyUser->etsy_token, $etsyUser->etsy_secret, $keywords, $category, $shipsto);
 				$listings = EtsyApi::parseListings($listings);
-				$watchlist->setListings($listings, $newListingsCount);
+				$watchlist->setListings($listings, $watchlistNewListingsCount);
 			}
 			$watchlist->last_checked = time();
 			$watchlist->save();
-			echo $watchlist->name . ' ' . $newListingsCount.'<br/>';
+			$newListingsCount += $watchlistNewListingsCount;
+			echo $watchlist->name . ' ' . $watchlistNewListingsCount.'<br/>';			
+		}
+		if($newListingsCount > 0) {
+			WatchlistsListings::flushCache();
 		}
 		die();
     }

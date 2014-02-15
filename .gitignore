@@ -14,3 +14,4 @@ Thumbs.db
 .idea/
 public/css/application.css
 deploy/run-deploy
+.sass-cache

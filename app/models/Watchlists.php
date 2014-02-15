@@ -130,18 +130,4 @@ class Watchlists extends CacheableModel
             }
         }
     }
-
-    public function clearGetCache($id) {
-        $cache = $this->getCache();
-        if($cache) {
-            $cache->delete($this->_getKey('findFirst', $id));
-        }
-    }
-
-    public function clearListCache() {
-        $cache = $this->getCache();
-        if($cache) {
-            $cache->delete($this->_getKey('find'));
-        }
-    }
 }
