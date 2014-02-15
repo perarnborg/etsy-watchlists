@@ -1,4 +1,5 @@
 <?php
+use Phalcon\Mvc\Model\Resultset;
 class MywatchlistsController extends ControllerBase
 {
     public function initialize()
@@ -37,7 +38,21 @@ class MywatchlistsController extends ControllerBase
         if($watchlistId) {
             $watchlist = Watchlists::findFirst($watchlistId);
             if($watchlist->etsy_users_id == $this->currentEtsyUser->id) {
-                $watchlistsListings = $watchlist->getWatchlistsListings(array("order" => "creation DESC"));
+                $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+                $pageSize = isset($_GET['pageSize']) ? (int)$_GET['pageSize'] : 32;
+                $watchlistsListings = $watchlist->getWatchlistsListings(array(
+                    "order" => "creation DESC",
+                    "limit" => array("number" => $pageSize, "offset" => $offset),
+                    "hydration" => Resultset::HYDRATE_OBJECTS
+                ));
+                if($offset > 0) {
+                    $json = '';
+                    foreach($watchlistsListings as $listing){
+                        $json .= json_encode($listing);
+                    };
+                    echo $json;
+                    die();
+                }
                 $this->view->currentWatchlist = $watchlist;
                 $this->view->currentWatchlistParameters = $watchlist->watchlistsParameters;
                 $this->view->currentWatchlistListings = $watchlistsListings;

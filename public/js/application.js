@@ -82,6 +82,100 @@ app.Modal.prototype.closeModal = function($modal) {
 	setTimeout(function(){$modal.remove();}, 200);
 };
 
+app.LoadMore = function() {
+	this.$loadMoreButton = $('.load-more');
+	if(this.$loadMoreButton.length > 0) {
+		this.offset = 0;
+		this.itemSelector = this.$loadMoreButton.data('item-selector');
+		this.pageSize = this.$loadMoreButton.data('item-selector');
+		this.$itemWrapper = this.$loadMoreButton.data('item-wrapper-selector');
+		this.url = this.$loadMoreButton.data('url');
+		this.infinateScroll = !Modernizr.touch;
+		if(this.$itemWrapper.length && this.url) {
+			if($(this.itemSelector).length < this.pageSize) {
+				this.reachedEnd();
+			} else {
+				this.eventListeners();
+			}
+		}
+	}
+};
+
+app.LoadMore.prototype.eventListeners = function() {
+	var self = this;
+	self.$loadMoreButton.click(function(e) {
+		if(!self.hasReachedEnd) {
+			self.loadMore();
+		}
+	});
+	if(self.infinateScroll) {
+		self.$loadMoreButton.hide();
+		self.setHeights();
+        self.$window.scroll(function() {
+          if (!self.reachedEnd) {
+            self.checkBottom();
+          }
+        }).resize(function() {
+            self.setHeights();
+        });
+    }
+};
+
+app.LoadMore.prototype.setHeights = function() {
+  this.bottomBuffer = 150;
+  this.winHeight = this.$window.height();
+  this.docHeight = this.$document.height();
+};
+
+app.LoadMore.prototype.reachedEnd = function() {
+	this.hasReachedEnd = true;
+	this.$loadMoreButton.hide();
+};
+
+app.LoadMore.prototype.checkBottom = function() {
+  var scrollTop = this.$window.scrollTop();
+  if (scrollTop >= (this.docHeight - this.winHeight - this.bottomBuffer) && !this.isLoading && !this.reachedEnd) {
+    this.loadMore();
+  }
+};
+
+app.LoadMore.prototype.loadMore = function() {
+	var self = this;
+	this.offset++;
+	var url = this.url+'?offset='+this.offset+'&pageSize='+this.pageSize;
+	self.isLoading = true;
+	self.$itemWrapper.addClass('loading');
+	$.ajax({
+		url: url,
+		success: function(data) {
+			self.onSuccess(data);
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			self.onError(errorThrown);
+		},
+		complete: function() {
+			self.isLoading = false;
+		}
+	});
+};
+
+app.LoadMore.prototype.onSuccess = function(data) {
+	if(data && data.length) {
+		this.$itemWrapper.append(data);
+	} else {
+		this.reachedEnd();
+	}
+};
+
+app.LoadMore.prototype.onError = function(errorThrown) {
+	if(errorThrown == 'Not Found') {
+		// Reached end if response is 404
+		this.reachedEnd();
+	} else {
+		this.$loadMoreButton.show();
+	}
+};
+
 app.Mywatchlists = function() {
     this.$searchForm = $('.search-on-etsy-form');
     if(this.$searchForm.length > 0) {
