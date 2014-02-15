@@ -38,8 +38,10 @@
 		</div>
 		<div class="search-on-etsy-results">
 			<ul class="clearfix"></ul>
+			{% if currentWatchlist is defined %}
+			<a href="#" class="button load-more" data-item-selector="." data-page-size="32" data-item-wrapper-selector=".search-on-etsy-results ul">Show more</a>
+			{% endif %}
 		</div>
-
 	</div>
 	<div class="my-watchlists">
 		<h3>Existing Watchlists</h3>

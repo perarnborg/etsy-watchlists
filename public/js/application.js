@@ -87,7 +87,7 @@ app.LoadMore = function() {
 	if(this.$loadMoreButton.length > 0) {
 		this.offset = 0;
 		this.itemSelector = this.$loadMoreButton.data('item-selector');
-		this.pageSize = this.$loadMoreButton.data('item-selector');
+		this.pageSize = this.$loadMoreButton.data('page-size');
 		this.$itemWrapper = this.$loadMoreButton.data('item-wrapper-selector');
 		this.url = this.$loadMoreButton.data('url');
 		this.infinateScroll = !Modernizr.touch;
