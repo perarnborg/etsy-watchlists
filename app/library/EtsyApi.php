@@ -2,6 +2,29 @@
 class EtsyApi {
 	const API_BASE = 'https://openapi.etsy.com/v2/';
 
+    private static function getCache(){
+        $cache = false;
+        $config = new Phalcon\Config\Adapter\Ini(__DIR__ . '/../config/config.ini');
+        $frontCache = new Phalcon\Cache\Frontend\Data(array(
+            "lifetime" => 3500
+        ));
+        if($config->cache == 'memory') {
+            $cache = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+                "host" => "localhost",
+                "port" => "11211"
+            ));
+        } else if($config->cache == 'file') {
+            $cache = new Phalcon\Cache\Backend\File($frontCache, array(
+                "cacheDir" => "../app/cache/file/"
+            ));
+        }
+        return $cache;
+    }
+
+    private static function getCacheKey($url){
+        return md5(get_called_class().'_'.$url;
+    }
+
     public static function parseListings($listingsResponse) {
         $listings = array();
         foreach ($listingsResponse as $listingResponse) {
@@ -64,6 +87,10 @@ class EtsyApi {
 
 	private static function makeRequest($apiKey, $apiSecret, $oauthToken, $oauthSecret, $path, $debug = false) {
         $url = self::API_BASE . $path;
+        $cache = self::getCache();
+        if($cache && $cached = $cache->get(self::getCacheKey($url))) {
+            return $cached;
+        }
         $oauth = new OAuth($apiKey, $apiSecret, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
         $oauth->setToken($oauthToken, $oauthSecret);
         $results = array();
@@ -77,6 +104,9 @@ class EtsyApi {
                 error_log(print_r($oauth->getLastResponse(), true));
                 error_log(print_r($oauth->getLastResponseInfo(), true));
             }
+        }
+        if($cache) {
+            $cache->save(self::getCacheKey($url), $data);
         }
         return $results;
 	}

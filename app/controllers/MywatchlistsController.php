@@ -16,7 +16,7 @@ class MywatchlistsController extends ControllerBase
     {
         $this->view->setTemplateAfter('main');
         $this->view->etsyUser = $this->currentEtsyUser;
-        $watchlists = watchlists::find(array(
+        $watchlists = Watchlists::find(array(
             "etsy_users_id = :etsy_users_id:",
             "bind" => array("etsy_users_id" => $this->currentEtsyUser->id)
         ));
