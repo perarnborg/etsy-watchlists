@@ -2,10 +2,26 @@ var app = window.app || {};
 
 $(document).ready(function () {
 	new app.Toggle();
+	app.utils = new app.Utils();
     app.modal = new app.Modal();
     app.flash = new app.Flash();
+    app.loadMore = new app.LoadMore();
     app.mywatchlists = new app.Mywatchlists();
 });
+
+app.Utils = function() {
+};
+
+app.Utils.prototype.executeFunctionByName = function(functionName, argument) {
+	var fn = window;
+	var functionParts = functionName.split('.');
+	for(var i = 0; i < functionParts.length; i++) {
+		fn = fn[functionParts[i]];
+	}
+	if(typeof(fn) == 'function') {
+		fn(argument);
+	}
+};
 
 app.Toggle = function() {
 	this.toggleTriggerSelector = '.toggle-trigger';
@@ -90,6 +106,7 @@ app.LoadMore = function() {
 		this.pageSize = this.$loadMoreButton.data('page-size');
 		this.$itemWrapper = this.$loadMoreButton.data('item-wrapper-selector');
 		this.url = this.$loadMoreButton.data('url');
+		this.itemCallback = this.$loadMoreButton.data('item-callback');
 		this.infinateScroll = !Modernizr.touch;
 		if(this.$itemWrapper.length && this.url) {
 			if($(this.itemSelector).length < this.pageSize) {
@@ -143,6 +160,9 @@ app.LoadMore.prototype.loadMore = function() {
 	var self = this;
 	this.offset++;
 	var url = this.url+'?offset='+this.offset+'&pageSize='+this.pageSize;
+	if(this.itemCallback) {
+		url += '&format=json';
+	}
 	self.isLoading = true;
 	self.$itemWrapper.addClass('loading');
 	$.ajax({
@@ -161,7 +181,15 @@ app.LoadMore.prototype.loadMore = function() {
 
 app.LoadMore.prototype.onSuccess = function(data) {
 	if(data && data.length) {
-		this.$itemWrapper.append(data);
+		var html = '';
+		if(this.itemCallback) {
+			for(var i = 0; i < data.length; i++) {
+				html += app.utils.executeFunctionByName(this.itemCallback, data[i]);
+			}
+		} else {
+			html = data;
+		}
+		this.$itemWrapper.append(html);			
 	} else {
 		this.reachedEnd();
 	}
@@ -466,5 +494,5 @@ app.Mywatchlists.prototype.getListingFromResponse = function(listingResponse) {
 };
 
 app.Mywatchlists.prototype.getListingMarkup = function(listing) {
-	return '<li'+(listing.is_viewed ? '' : ' class="listing-new"')+'><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><img src="'+listing.image_url+'" alt="'+listing.title+'" /></a><div class="listing-text clearfix"><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><h3 class="listing-title">'+listing.title+'</h3></a><a class="listing-shop" href="'+listing.shop_url+'" title="Checkout '+listing.shop_loginname+(listing.shop_loginname.toLowerCase().substr(listing.shop_loginname.length-1, 1) == 's' ? "'" : "'s")+' shop" target="_blank">'+listing.shop_loginname+'</a><span class="listing-price">'+listing.currency_code+' '+listing.price+'</span></div></li>';
+	return '<li class="'+(listing.is_viewed ? '' : ' listing-new')+'"><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><img src="'+listing.image_url+'" alt="'+listing.title+'" /></a><div class="listing-text clearfix"><a href="'+listing.url+'" title="'+listing.title+'" target="_blank"><h3 class="listing-title">'+listing.title+'</h3></a><a class="listing-shop" href="'+listing.shop_url+'" title="Checkout '+listing.shop_loginname+(listing.shop_loginname.toLowerCase().substr(listing.shop_loginname.length-1, 1) == 's' ? "'" : "'s")+' shop" target="_blank">'+listing.shop_loginname+'</a><span class="listing-price">'+listing.currency_code+' '+listing.price+'</span></div></li>';
 };

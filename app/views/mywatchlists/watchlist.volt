@@ -39,7 +39,7 @@
 		<div class="search-on-etsy-results">
 			<ul class="clearfix"></ul>
 			{% if currentWatchlist is defined %}
-			<a href="#" class="button load-more" data-item-selector="." data-page-size="32" data-item-wrapper-selector=".search-on-etsy-results ul">Show more</a>
+			<a href="?offset={{ (offset + 1) }}&pageSize=32" class="button load-more" data-item-selector=".search-on-etsy-results .listing" data-page-size="32" data-item-wrapper-selector=".search-on-etsy-results ul" data-item-callback="app.myWatchlists.getListingMarkup" data-url="/mywatclists/watchlist/{{ currentWatchlist.id }}">Show more</a>
 			{% endif %}
 		</div>
 	</div>

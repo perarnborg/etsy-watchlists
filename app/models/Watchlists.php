@@ -1,7 +1,7 @@
 <?php
 use Phalcon\Mvc\Model\Relation;
 use Phalcon\Mvc\Model\Resultset;
-class Watchlists extends Phalcon\Mvc\Model
+class Watchlists extends CacheableModel
 {
     /**
      * @var integer

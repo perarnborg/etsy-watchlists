@@ -40,12 +40,13 @@ class MywatchlistsController extends ControllerBase
             if($watchlist->etsy_users_id == $this->currentEtsyUser->id) {
                 $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
                 $pageSize = isset($_GET['pageSize']) ? (int)$_GET['pageSize'] : 32;
+                $format = isset($_GET['format']) ? (int)$_GET['format'] : 'html';
                 $watchlistsListings = $watchlist->getWatchlistsListings(array(
                     "order" => "creation DESC",
                     "limit" => array("number" => $pageSize, "offset" => $offset),
                     "hydration" => Resultset::HYDRATE_OBJECTS
                 ));
-                if($offset > 0) {
+                if($format == 'json') {
                     $json = '';
                     foreach($watchlistsListings as $listing){
                         $json .= json_encode($listing);
@@ -56,6 +57,7 @@ class MywatchlistsController extends ControllerBase
                 $this->view->currentWatchlist = $watchlist;
                 $this->view->currentWatchlistParameters = $watchlist->watchlistsParameters;
                 $this->view->currentWatchlistListings = $watchlistsListings;
+                $this->view->offset = $offset;
             }
         }
         $this->view->watchlists = watchlists::find(array(

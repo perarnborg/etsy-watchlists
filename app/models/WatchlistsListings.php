@@ -1,6 +1,6 @@
 <?php
 
-class WatchlistsListings extends Phalcon\Mvc\Model
+class WatchlistsListings extends CacheableModel
 {
     /**
      * @var integer
